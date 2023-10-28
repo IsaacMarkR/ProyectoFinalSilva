@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const apiKey = '10f3b5da601139864e28d0c0'; // Tu clave de API de ExchangeRate-API
     const numeroInput = document.getElementById("numeroInput");
     const agregarNumeroButton = document.getElementById("agregarNumero");
     const resultsList = document.getElementById("resultsList");
@@ -35,38 +36,52 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    const operaciones = ["Sumar", "Restar", "Multiplicar", "Dividir"];
-
-    operaciones.forEach((operacion) => {
-        const button = document.createElement("button");
-        button.textContent = operacion;
-        button.addEventListener("click", function () {
-            if (numeros.length < 2) {
-                alert(`Debe ingresar al menos dos números para ${operacion.toLowerCase()}.`);
-                return;
-            }
-
-            let resultado;
-            switch (operacion) {
-                case "Sumar":
-                    resultado = numeros.reduce((a, b) => a + b);
-                    break;
-                case "Restar":
-                    resultado = numeros.reduce((a, b) => a - b);
-                    break;
-                case "Multiplicar":
-                    resultado = numeros.reduce((a, b) => a * b);
-                    break;
-                case "Dividir":
-                    resultado = numeros.reduce((a, b) => a / b);
-                    break;
-            }
-
-            const li = document.createElement("li");
-            li.textContent = `${operacion}: ${resultado}`;
-            resultsList.appendChild(li);
+    function obtenerTasasDeCambio() {
+        return new Promise((resolve, reject) => {
+            fetch(`https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error("Error en la solicitud de tasas de cambio.");
+                    }
+                })
+                .then(data => {
+                    if (data && data.conversion_rates) {
+                        resolve(data.conversion_rates);
+                    } else {
+                        throw new Error("Datos de tasas de cambio no válidos.");
+                    }
+                })
+                .catch(error => {
+                    reject(error);
+                });
         });
+    }
 
-        document.querySelector(".operations").appendChild(button);
-    });
+    function convertirMoneda(monto, monedaOrigen, monedaDestino) {
+        return obtenerTasasDeCambio()
+            .then(rates => {
+                const tasaOrigen = rates[monedaOrigen];
+                const tasaDestino = rates[monedaDestino];
+
+                if (tasaOrigen && tasaDestino) {
+                    const resultado = (monto / tasaOrigen) * tasaDestino;
+                    return resultado;
+                } else {
+                    throw new Error("Moneda no encontrada en las tasas de cambio.");
+                }
+            });
+    }
+
+    // Ejemplo de uso:
+    convertirMoneda(100, 'USD', 'EUR')
+        .then(resultado => {
+            const li = document.createElement("li");
+            li.textContent = `100 USD = ${resultado.toFixed(2)} EUR`;
+            resultsList.appendChild(li);
+        })
+        .catch(error => {
+            console.error("Error en la conversión de moneda:", error);
+        });
 });
