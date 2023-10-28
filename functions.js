@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const agregarNumeroButton = document.getElementById("agregarNumero");
     const resultsList = document.getElementById("resultsList");
     const mathButton = document.getElementById("calcularMath");
+    const convertirButton = document.getElementById("convertirMoneda");
+    const sumaButton = document.getElementById("suma");
+    const restaButton = document.getElementById("resta");
+    const multiplicacionButton = document.getElementById("multiplicacion");
+    const divisionButton = document.getElementById("division");
 
     const numeros = [];
 
@@ -34,6 +39,60 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             alert("La expresión ingresada es inválida.");
         }
+    });
+
+    convertirButton.addEventListener("click", function () {
+        const monto = numeros[numeros.length - 1]; // Tomar el último número ingresado
+        const monedaOrigen = prompt("Ingrese la moneda de origen (por ejemplo, 'USD'):");
+        const monedaDestino = prompt("Ingrese la moneda de destino (por ejemplo, 'EUR'):");
+
+        convertirMoneda(monto, monedaOrigen, monedaDestino)
+            .then(resultado => {
+                const li = document.createElement("li");
+                li.textContent = `${monto} ${monedaOrigen} = ${resultado.toFixed(2)} ${monedaDestino}`;
+                resultsList.appendChild(li);
+            })
+            .catch(error => {
+                alert("Error en la conversión de moneda: " + error);
+            });
+    });
+
+    sumaButton.addEventListener("click", function () {
+        const resultado = numeros.reduce((a, b) => a + b, 0);
+        const li = document.createElement("li");
+        li.textContent = `Resultado de la suma: ${resultado}`;
+        resultsList.appendChild(li);
+    });
+
+    restaButton.addEventListener("click", function () {
+        if (numeros.length < 2) {
+            alert("Debe ingresar al menos dos números para restar.");
+            return;
+        }
+
+        const resultado = numeros.reduce((a, b) => a - b);
+        const li = document.createElement("li");
+        li.textContent = `Resultado de la resta: ${resultado}`;
+        resultsList.appendChild(li);
+    });
+
+    multiplicacionButton.addEventListener("click", function () {
+        const resultado = numeros.reduce((a, b) => a * b, 1);
+        const li = document.createElement("li");
+        li.textContent = `Resultado de la multiplicación: ${resultado}`;
+        resultsList.appendChild(li);
+    });
+
+    divisionButton.addEventListener("click", function () {
+        if (numeros.length < 2) {
+            alert("Debe ingresar al menos dos números para dividir.");
+            return;
+        }
+
+        const resultado = numeros.reduce((a, b) => a / b);
+        const li = document.createElement("li");
+        li.textContent = `Resultado de la división: ${resultado}`;
+        resultsList.appendChild(li);
     });
 
     function obtenerTasasDeCambio() {
@@ -73,15 +132,4 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
     }
-
-    // Ejemplo de uso:
-    convertirMoneda(100, 'USD', 'EUR')
-        .then(resultado => {
-            const li = document.createElement("li");
-            li.textContent = `100 USD = ${resultado.toFixed(2)} EUR`;
-            resultsList.appendChild(li);
-        })
-        .catch(error => {
-            console.error("Error en la conversión de moneda:", error);
-        });
 });
