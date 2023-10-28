@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const resultsList = document.getElementById("resultsList");
 
     const numeros = [];
+    let operacionesHabilitadas = false; // Variable para rastrear si se pueden realizar operaciones.
 
     agregarNumeroButton.addEventListener("click", function () {
         const valor = parseFloat(numeroInput.value);
@@ -19,6 +20,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const li = document.createElement("li");
         li.textContent = `Número ingresado: ${valor}`;
         resultsList.appendChild(li);
+
+        // Habilitar las operaciones cuando se ingresen al menos dos valores.
+        if (numeros.length >= 2) {
+            operacionesHabilitadas = true;
+        }
     });
 
     const operaciones = ["Sumar", "Restar", "Multiplicar", "Dividir"];
@@ -27,8 +33,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const button = document.createElement("button");
         button.textContent = operacion;
         button.addEventListener("click", function () {
-            if (numeros.length < 2) {
-                alert(`Debe ingresar al menos dos números para ${operacion.toLowerCase()}.`);
+            if (!operacionesHabilitadas) {
+                alert("Ingrese al menos dos números antes de realizar operaciones.");
                 return;
             }
 
