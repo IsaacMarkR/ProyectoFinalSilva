@@ -2,9 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const numeroInput = document.getElementById("numeroInput");
     const agregarNumeroButton = document.getElementById("agregarNumero");
     const resultsList = document.getElementById("resultsList");
+    const mathButton = document.getElementById("calcularMath");
 
     const numeros = [];
-    let operacionesHabilitadas = false; // Variable para rastrear si se pueden realizar operaciones.
 
     agregarNumeroButton.addEventListener("click", function () {
         const valor = parseFloat(numeroInput.value);
@@ -20,21 +20,29 @@ document.addEventListener("DOMContentLoaded", function () {
         const li = document.createElement("li");
         li.textContent = `Número ingresado: ${valor}`;
         resultsList.appendChild(li);
+    });
 
-        // Habilitar las operaciones cuando se ingresen al menos dos valores.
-        if (numeros.length >= 2) {
-            operacionesHabilitadas = true;
+    mathButton.addEventListener("click", function () {
+        const expresion = prompt("Ingrese una expresión matemática (por ejemplo, '2 * (3 + 4)'):");
+
+        try {
+            const resultado = math.evaluate(expresion);
+            const li = document.createElement("li");
+            li.textContent = `Resultado de la expresión: ${expresion} = ${resultado}`;
+            resultsList.appendChild(li);
+        } catch (error) {
+            alert("La expresión ingresada es inválida.");
         }
     });
 
     const operaciones = ["Sumar", "Restar", "Multiplicar", "Dividir"];
-    
+
     operaciones.forEach((operacion) => {
         const button = document.createElement("button");
         button.textContent = operacion;
         button.addEventListener("click", function () {
-            if (!operacionesHabilitadas) {
-                alert("Ingrese al menos dos números antes de realizar operaciones.");
+            if (numeros.length < 2) {
+                alert(`Debe ingresar al menos dos números para ${operacion.toLowerCase()}.`);
                 return;
             }
 
